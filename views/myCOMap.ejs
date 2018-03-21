@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Maps</title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script>
+        //        locations = JSON.parse(JSON.stringify(loc));
+        var locations = String(<%- JSON.stringify(loc) %>)
+        //        locations = loc;
+        var map = 1;
+
+        function initMap(){
+            var newLoc = JSON.parse(locations);
+            var latlng = new google.maps.LatLng(37.368862, -121.980572);
+            map = new google.maps.Map(document.getElementById('map-canvas'), {
+                center: latlng,
+                scrollwheel: false,
+                zoom: 9
+            });
+
+            var companyLoc = newLoc.locations.location;
+            for (var i = 0; i < companyLoc.length; i++) {
+                var icon;
+                console.log(companyLoc[i]);
+                var type = companyLoc[i].type;
+                switch (type) {
+                    case("RetailLocation"):
+                        icon = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                        break;
+                    case("HeadQuarters"):
+                        icon = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                        break;
+                    case("Call Center"):
+                        icon = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+                        break;
+                    default:
+                        icon = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                        break;
+                }
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: {lat: companyLoc[i].latitude, lng: companyLoc[i].longitude},
+                    title: companyLoc[i].id + companyLoc[i].type + " - " + companyLoc[i].address,
+                    icon: icon
+                });
+
+                var cityCircle = new google.maps.Circle({
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+//                    fillColor: '#FF0000',
+                    fillOpacity: 0.35,
+                    map: map,
+                    center: {lat: companyLoc[i].latitude, lng: companyLoc[i].longitude},
+                    radius: Math.sqrt(companyLoc[i].$revenue)
+                });
+        }}
+    </script>
+
+</head>
+<body onload="initMap()">
+<p>
+</p>
+<div class="banner">MyCO</div>
+<div class="panel-body" id="map-loc-trace">
+    <div id="map-canvas" class="mapCSS"></div>
+</div>
+</body>
+</html>
